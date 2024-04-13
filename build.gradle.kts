@@ -131,6 +131,7 @@ publishing {
         maven {
             val releasesUrl = uri("https://sibmaks.ru/repository/maven-releases/")
             val snapshotsUrl = uri("https://sibmaks.ru/repository/maven-snapshots/")
+            name = "SecNexus"
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
             credentials {
                 username = project.findProperty("nexus_username")?.toString() ?: System.getenv("NEXUS_USERNAME")

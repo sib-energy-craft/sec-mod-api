@@ -2,7 +2,7 @@ package com.github.sib_energy_craft.machines.recipe;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.AbstractCookingRecipe;
+import net.minecraft.recipe.CookingRecipeSerializer.RecipeFactory;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CookingRecipeCategory;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 0.0.1
  */
 public record CookingRecipeSerializer<T extends OpenAbstractCookingRecipe>(
-        @NotNull AbstractCookingRecipe.RecipeFactory<T> recipeFactory,
+        @NotNull RecipeFactory<T> recipeFactory,
         @NotNull Codec<T> codec,
         int cookingTime) implements RecipeSerializer<T> {
 
