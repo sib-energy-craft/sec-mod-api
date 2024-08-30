@@ -7,7 +7,7 @@ import net.minecraft.util.Hand;
 
 /**
  * Tree tap tool interface<br/>
- * Rubber tree call {@link TreeTap#onUse(PlayerEntity, Hand, ItemStack)} when player use tree tap on rubber block.
+ * Rubber tree call {@link TreeTap#onUse(PlayerEntity, Hand, ItemStack)} when player uses tree tap on rubber block.
  *
  * @author sibmaks
  * @since 0.0.1

@@ -1,12 +1,13 @@
 package com.github.sib_energy_craft.machines.block.entity.property;
 
-import com.github.sib_energy_craft.screen.property.ScreenPropertyType;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 
 /**
  * @author sibmaks
  * @since 0.0.30
  */
-public interface EnergyMachineTypedProperty<T> {
+public interface EnergyMachineTypedProperty<B extends ByteBuf, T> {
 
     /**
      * Get property index
@@ -16,10 +17,10 @@ public interface EnergyMachineTypedProperty<T> {
     int getIndex();
 
     /**
-     * Get screen property type
+     * Get a screen property codec
      *
      * @return type
-     * @see com.github.sib_energy_craft.screen.property.ScreenPropertyTypes
+     * @see com.github.sib_energy_craft.screen.property.ScreenPropertyCodecs
      */
-    ScreenPropertyType<T> getPropertyType();
+    PacketCodec<B, T> getCodec();
 }

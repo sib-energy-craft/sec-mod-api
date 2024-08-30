@@ -1,28 +1,35 @@
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.*
 
 plugins {
-    id("fabric-loom") version "1.6-SNAPSHOT"
+    id("fabric-loom") version "1.7-SNAPSHOT"
     id("maven-publish")
     id("java")
+    id("jacoco")
 }
 
-version = project.property("mod_version") as String
+val modVersion = project.property("mod_version") as String
+val minecraftVersion = project.property("minecraft_version") as String
+
+version = "$modVersion-$minecraftVersion"
 group = project.property("maven_group") as String
+
+val targetJavaVersion = (project.property("jdk_version") as String).toInt()
+val javaVersion = JavaVersion.toVersion(targetJavaVersion)
 
 allprojects {
     apply(plugin = "fabric-loom")
     apply(plugin = "java")
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 
     repositories {
         mavenCentral()
-        maven(url = "https://sibmaks.ru/repository/maven-snapshots/")
-        maven(url = "https://sibmaks.ru/repository/maven-releases/")
+        maven(url = "https://nexus.sibmaks.ru/repository/maven-snapshots/")
+        maven(url = "https://nexus.sibmaks.ru/repository/maven-releases/")
     }
 
 }
@@ -31,8 +38,8 @@ dependencies {
     compileOnly("org.projectlombok:lombok:${project.property("lombok_version")}")
     annotationProcessor("org.projectlombok:lombok:${project.property("lombok_version")}")
 
-    // To change the versions see the gradle.properties file
-    minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
+    // To change the versions, see the gradle.properties file
+    minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 
@@ -48,12 +55,14 @@ tasks.processResources {
     inputs.property("version", project.version)
     filteringCharset = "UTF-8"
 
+    val properties = project.properties.mapKeys { it.key }
+        .mapValues { it.value.toString() }
+
     filesMatching("fabric.mod.json") {
-        expand("version" to project.version)
+        expand(properties)
     }
 }
 
-val targetJavaVersion = (project.property("jdk_version") as String).toInt()
 tasks.withType<JavaCompile>().configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly
@@ -66,7 +75,6 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 java {
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
@@ -83,14 +91,14 @@ tasks.jar {
             mapOf(
                 "Specification-Title" to project.property("mod_name"),
                 "Specification-Vendor" to project.property("mod_author"),
-                "Specification-Version" to project.property("mod_version"),
+                "Specification-Version" to version,
                 "Implementation-Title" to project.name,
-                "Implementation-Version" to project.property("mod_version"),
+                "Implementation-Version" to version,
                 "Implementation-Vendor" to project.property("mod_author"),
                 "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date()),
                 "Timestamp" to System.currentTimeMillis(),
                 "Built-On-Java" to "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})",
-                "Build-On-Minecraft" to project.property("minecraft_version")
+                "Build-On-Minecraft" to minecraftVersion
             )
         )
     }
@@ -129,9 +137,8 @@ publishing {
     }
     repositories {
         maven {
-            val releasesUrl = uri("https://sibmaks.ru/repository/maven-releases/")
-            val snapshotsUrl = uri("https://sibmaks.ru/repository/maven-snapshots/")
-            name = "SecNexus"
+            val releasesUrl = uri("https://nexus.sibmaks.ru/repository/maven-releases/")
+            val snapshotsUrl = uri("https://nexus.sibmaks.ru/repository/maven-snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
             credentials {
                 username = project.findProperty("nexus_username")?.toString() ?: System.getenv("NEXUS_USERNAME")
@@ -147,4 +154,12 @@ publishing {
             }
         }
     }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
 }

@@ -1,13 +1,14 @@
 package com.github.sib_energy_craft.machines.block.entity.property;
 
-import com.github.sib_energy_craft.screen.property.ScreenPropertyType;
-import com.github.sib_energy_craft.screen.property.ScreenPropertyTypes;
+import com.github.sib_energy_craft.screen.property.ScreenPropertyCodecs;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 
 /**
- * @since 0.0.1
  * @author sibmaks
+ * @since 0.0.1
  */
-public enum EnergyMachineTypedProperties implements EnergyMachineTypedProperty<Integer> {
+public enum EnergyMachineTypedProperties implements EnergyMachineTypedProperty<ByteBuf, Integer> {
     CHARGE,
     MAX_CHARGE;
 
@@ -19,7 +20,8 @@ public enum EnergyMachineTypedProperties implements EnergyMachineTypedProperty<I
     }
 
     @Override
-    public ScreenPropertyType<Integer> getPropertyType() {
-        return ScreenPropertyTypes.INT;
+    public PacketCodec<ByteBuf, Integer> getCodec() {
+        return ScreenPropertyCodecs.INTEGER;
     }
+
 }

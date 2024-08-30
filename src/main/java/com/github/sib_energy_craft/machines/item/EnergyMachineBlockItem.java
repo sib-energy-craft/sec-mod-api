@@ -1,14 +1,12 @@
 package com.github.sib_energy_craft.machines.item;
 
 import com.github.sib_energy_craft.machines.block.AbstractEnergyMachineBlock;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.List;
@@ -25,10 +23,10 @@ public class EnergyMachineBlockItem<T extends AbstractEnergyMachineBlock> extend
 
     @Override
     public void appendTooltip(@NotNull ItemStack stack,
-                              @Nullable World world,
+                              @NotNull TooltipContext context,
                               @NotNull List<Text> tooltip,
-                              @NotNull TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+                              @NotNull TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
         var block = getBlock();
         var maxCharge = block.getMaxCharge()
                 .toPlainString();

@@ -10,8 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
-
 /**
  * @author sibmaks
  * @since 0.0.1
@@ -73,8 +71,7 @@ public class CleanEnergyContainer implements EnergyContainer, ChargeableEnergyCo
      */
     @NotNull
     public static CleanEnergyContainer readNbt(@NotNull NbtCompound nbt) {
-        var energyAmount = new BigDecimal(nbt.getString("Charge"));
-        var charge = new Energy(energyAmount);
+        var charge = Energy.readNbt("Charge", nbt);
         var maxCharge = Energy.readNbt("MaxCharge", nbt);
         return new CleanEnergyContainer(charge, maxCharge);
     }
@@ -85,8 +82,7 @@ public class CleanEnergyContainer implements EnergyContainer, ChargeableEnergyCo
      * @param nbt block NBT
      */
     public synchronized void writeNbt(@NotNull NbtCompound nbt) {
-        var energyAmount = charge.getAmount();
-        nbt.putString("Charge", energyAmount.toPlainString());
+        charge.writeNbt("Charge", nbt);
         maxCharge.writeNbt("MaxCharge", nbt);
     }
 

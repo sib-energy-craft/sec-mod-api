@@ -2,14 +2,15 @@ package com.github.sib_energy_craft.machines.cooking.block.entity.property;
 
 import com.github.sib_energy_craft.machines.block.entity.property.EnergyMachineTypedProperties;
 import com.github.sib_energy_craft.machines.block.entity.property.EnergyMachineTypedProperty;
-import com.github.sib_energy_craft.screen.property.ScreenPropertyType;
-import com.github.sib_energy_craft.screen.property.ScreenPropertyTypes;
+import com.github.sib_energy_craft.screen.property.ScreenPropertyCodecs;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 
 /**
  * @author sibmaks
  * @since 0.0.36
  */
-public enum CookingEnergyMachineTypedProperties implements EnergyMachineTypedProperty<Integer> {
+public enum CookingEnergyMachineTypedProperties implements EnergyMachineTypedProperty<ByteBuf, Integer> {
     COOKING_TIME,
     COOKING_TIME_TOTAL;
 
@@ -22,7 +23,7 @@ public enum CookingEnergyMachineTypedProperties implements EnergyMachineTypedPro
     }
 
     @Override
-    public ScreenPropertyType<Integer> getPropertyType() {
-        return ScreenPropertyTypes.INT;
+    public PacketCodec<ByteBuf, Integer> getCodec() {
+        return ScreenPropertyCodecs.INTEGER;
     }
 }

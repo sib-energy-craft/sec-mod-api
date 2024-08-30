@@ -9,8 +9,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @since 0.0.1
  * @author sibmaks
+ * @since 0.0.1
  */
 public class OutputSlot extends Slot {
     private final PlayerEntity player;
@@ -52,7 +52,7 @@ public class OutputSlot extends Slot {
 
     @Override
     protected void onCrafted(@NotNull ItemStack stack) {
-        stack.onCraft(this.player.getWorld(), this.player, this.amount);
+        stack.onCraftByPlayer(this.player.getWorld(), this.player, this.amount);
         if (this.player instanceof ServerPlayerEntity serverPlayer &&
                 this.inventory instanceof ExperienceCreatingMachine experienceCreatingMachine) {
             experienceCreatingMachine.dropExperienceForRecipesUsed(serverPlayer);

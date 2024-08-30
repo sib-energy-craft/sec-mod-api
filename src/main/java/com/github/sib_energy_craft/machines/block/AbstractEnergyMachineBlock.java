@@ -19,7 +19,6 @@ import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -65,12 +64,11 @@ public abstract class AbstractEnergyMachineBlock extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(@NotNull BlockState state,
-                              @NotNull World world,
-                              @NotNull BlockPos pos,
-                              @NotNull PlayerEntity player,
-                              @NotNull Hand hand,
-                              @NotNull BlockHitResult hit) {
+    protected ActionResult onUse(@NotNull BlockState state,
+                                 @NotNull World world,
+                                 @NotNull BlockPos pos,
+                                 @NotNull PlayerEntity player,
+                                 @NotNull BlockHitResult hit) {
         if (world.isClient) {
             return ActionResult.SUCCESS;
         }

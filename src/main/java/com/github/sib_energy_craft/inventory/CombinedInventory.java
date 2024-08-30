@@ -1,4 +1,4 @@
-package com.github.sib_energy_craft.machines;
+package com.github.sib_energy_craft.inventory;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,15 +120,15 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
     /**
      * Get item stack from specific inventory type
      *
-     * @param type slot type
-     * @param slot slot index
+     * @param type      slot type
+     * @param slot      slot index
      * @param itemStack stack to insert
      */
     public void setStack(@NotNull T type,
                          int slot,
                          @NotNull ItemStack itemStack) {
         var inventory = typedInventories.get(type);
-        if(inventory != null) {
+        if (inventory != null) {
             inventory.setStack(slot, itemStack);
         }
     }
@@ -144,6 +145,7 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
 
     /**
      * Get inventory type by slot index
+     *
      * @param slot slot index
      * @return inventory type or null
      */
@@ -156,13 +158,13 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
      * Add stack into inventory
      *
      * @param inventoryType inventory type
-     * @param stack stack to insert
+     * @param stack         stack to insert
      * @return not inserted stack
      */
     public @NotNull ItemStack addStack(@NotNull T inventoryType,
                                        @NotNull ItemStack stack) {
         var inventory = getInventory(inventoryType);
-        if(inventory == null) {
+        if (inventory == null) {
             return stack;
         }
         var copiedStack = stack.copy();
@@ -181,16 +183,16 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
      * Can stack be inserted into inventory
      *
      * @param inventoryType inventory type
-     * @param stack stack to insert
+     * @param stack         stack to insert
      * @return not inserted stack
      */
     public boolean canInsert(@NotNull T inventoryType,
                              @NotNull ItemStack stack) {
         var inventory = getInventory(inventoryType);
-        if(inventory == null) {
+        if (inventory == null) {
             return false;
         }
-        if(canAddToExistingSlot(inventory, stack)) {
+        if (canAddToExistingSlot(inventory, stack)) {
             return true;
         }
         return canAddToNewSlot(inventory);
@@ -200,8 +202,8 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
      * Searches this inventory for the specified item and removes the given amount from this inventory.
      *
      * @param inventoryType inventory type
-     * @param item item to remove
-     * @param count amount to remove
+     * @param item          item to remove
+     * @param count         amount to remove
      * @return the stack of removed items
      */
     public @NotNull ItemStack removeItem(@NotNull T inventoryType,
@@ -209,7 +211,7 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
                                          int count) {
         var removedStack = new ItemStack(item, 0);
         var inventory = getInventory(inventoryType);
-        if(inventory == null) {
+        if (inventory == null) {
             return removedStack;
         }
         for (int i = inventory.size() - 1; i >= 0; --i) {
@@ -234,15 +236,15 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
      * Check ability to remove from inventory required amount of items.
      *
      * @param inventoryType inventory type
-     * @param item item to remove
-     * @param count amount to remove
+     * @param item          item to remove
+     * @param count         amount to remove
      * @return true - can remove, false - otherwise
      */
     public boolean canRemoveItem(@NotNull T inventoryType,
                                  @NotNull Item item,
                                  int count) {
         var inventory = getInventory(inventoryType);
-        if(inventory == null) {
+        if (inventory == null) {
             return false;
         }
         int have = 0;
@@ -263,10 +265,10 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
                                                 @NotNull ItemStack stack) {
         for (int i = 0; i < inventory.size(); ++i) {
             var itemStack = inventory.getStack(i);
-            if (!ItemStack.canCombine(itemStack, stack)) {
+            if (!ItemStack.areItemsAndComponentsEqual(itemStack, stack)) {
                 continue;
             }
-            if(canTransfer(inventory, stack, itemStack)) {
+            if (canTransfer(inventory, stack, itemStack)) {
                 return true;
             }
         }
@@ -277,7 +279,7 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
                                           @NotNull ItemStack stack) {
         for (int i = 0; i < inventory.size(); ++i) {
             var itemStack = inventory.getStack(i);
-            if (!ItemStack.canCombine(itemStack, stack)) {
+            if (!ItemStack.areItemsAndComponentsEqual(itemStack, stack)) {
                 continue;
             }
             transfer(inventory, stack, itemStack);
@@ -330,7 +332,8 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
         return j > 0;
     }
 
-    public void readNbt(@NotNull NbtCompound nbt) {
+    public void readNbt(@NotNull NbtCompound nbt,
+                        @NotNull RegistryWrapper.WrapperLookup registryLookup) {
         for (var entry : typedInventories.entrySet()) {
             var inventoryType = entry.getKey();
             var code = "inventory_%s".formatted(inventoryType.name());
@@ -342,12 +345,15 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
                 if (j >= stacks.size()) {
                     continue;
                 }
-                inventory.setStack(j, ItemStack.fromNbt(nbtCompound));
+                var nbtItemStack = nbtCompound.getCompound("Item");
+                var itemStack = ItemStack.fromNbtOrEmpty(registryLookup, nbtItemStack);
+                inventory.setStack(j, itemStack);
             }
         }
     }
 
-    public void writeNbt(@NotNull NbtCompound nbt) {
+    public void writeNbt(@NotNull NbtCompound nbt,
+                         @NotNull RegistryWrapper.WrapperLookup registryLookup) {
         for (var entry : typedInventories.entrySet()) {
             var inventoryType = entry.getKey();
             var nbtList = new NbtList();
@@ -358,8 +364,8 @@ public class CombinedInventory<T extends Enum<T>> implements Inventory {
                     continue;
                 }
                 var nbtCompound = new NbtCompound();
-                nbtCompound.putByte("Slot", (byte)i);
-                itemStack.writeNbt(nbtCompound);
+                nbtCompound.putByte("Slot", (byte) i);
+                nbtCompound.put("Item", itemStack.encode(registryLookup));
                 nbtList.add(nbtCompound);
             }
             var code = "inventory_%s".formatted(inventoryType.name());

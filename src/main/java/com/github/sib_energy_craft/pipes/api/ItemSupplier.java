@@ -7,24 +7,25 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * @since 0.0.1
  * @author sibmaks
+ * @since 0.0.1
  */
 public interface ItemSupplier {
 
     /**
-     * Get list of items that supplier can supply from requested side
+     * Get a list of items that supplier can supply from the requested side
      *
-     * @param direction supplying direction
+     * @param direction supplying directions
      * @return list of item stacks or empty list
      */
-    @NotNull List<ItemStack> canSupply(@NotNull Direction direction);
+    @NotNull
+    List<ItemStack> canSupply(@NotNull Direction direction);
 
     /**
-     * Supply item stack from passed direction
+     * Supply item stack from a passed direction
      *
      * @param requested requested item stack for supply
-     * @param direction supplying direction
+     * @param direction supplying directions
      * @return true - item successfully supplied, false - otherwise
      */
     boolean supply(@NotNull ItemStack requested, @NotNull Direction direction);
@@ -33,7 +34,7 @@ public interface ItemSupplier {
      * Return supplied stack into supplier, in case if item can't be consumed
      *
      * @param requested requested item stack for rollback supply
-     * @param direction supplying direction
+     * @param direction supplying directions
      */
     void returnStack(@NotNull ItemStack requested, @NotNull Direction direction);
 }

@@ -232,7 +232,7 @@ public final class PipeUtils {
      */
     public static boolean canMergeItems(@NotNull ItemStack first,
                                         @NotNull ItemStack second) {
-        return ItemStack.canCombine(first, second) && first.getCount() < first.getMaxCount();
+        return ItemStack.areItemsAndComponentsEqual(first, second) && first.getCount() < first.getMaxCount();
     }
 
     /**

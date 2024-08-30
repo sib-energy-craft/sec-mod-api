@@ -1,15 +1,16 @@
 package com.github.sib_energy_craft.machines.utils;
 
-import com.github.sib_energy_craft.machines.CombinedInventory;
+import com.github.sib_energy_craft.inventory.CombinedInventory;
 import com.github.sib_energy_craft.machines.block.entity.EnergyMachineInventoryType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 public final class EnergyMachineUtils {
 
     /**
-     * Calculate cooking time for abstract cooking recipe
+     * Calculate cooking time for an abstract cooking recipe
      *
      * @param world      game world
      * @param recipeType recipe type
@@ -31,7 +32,7 @@ public final class EnergyMachineUtils {
      */
     public static <T extends AbstractCookingRecipe> int getCookTimeTotal(@NotNull World world,
                                                                          @NotNull RecipeType<T> recipeType,
-                                                                         @NotNull Inventory inventory) {
+                                                                         @NotNull SingleStackRecipeInput inventory) {
         return world.getRecipeManager()
                 .getFirstMatch(recipeType, inventory, world)
                 .map(RecipeEntry::value)
@@ -42,7 +43,7 @@ public final class EnergyMachineUtils {
     /**
      * Method check can recipe output be applied.<br/>
      * Slot chose current slot index to cooking<br/>
-     * Assuming that machine work with process in mode 1 input to 1 output
+     * Assuming that machine works with a process in mode 1 input to 1 output
      *
      * @param slot              slot index
      * @param combinedInventory machine inventory
@@ -54,7 +55,7 @@ public final class EnergyMachineUtils {
     public static boolean canAcceptRecipeOutput(int slot,
                                                 @NotNull CombinedInventory<EnergyMachineInventoryType> combinedInventory,
                                                 @NotNull World world,
-                                                @NotNull Recipe<Inventory> recipe,
+                                                @NotNull Recipe<RecipeInput> recipe,
                                                 int count) {
         var sourceStack = combinedInventory.getStack(EnergyMachineInventoryType.SOURCE, slot);
         if (sourceStack.isEmpty()) {
@@ -92,7 +93,7 @@ public final class EnergyMachineUtils {
     public static boolean craftRecipe(int slot,
                                       @NotNull CombinedInventory<EnergyMachineInventoryType> combinedInventory,
                                       @NotNull World world,
-                                      @NotNull Recipe<Inventory> recipe,
+                                      @NotNull Recipe<RecipeInput> recipe,
                                       int decrement,
                                       int maxCount) {
         if (!canAcceptRecipeOutput(slot, combinedInventory, world, recipe, maxCount)) {

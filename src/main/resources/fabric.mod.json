@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "sec-mod-api",
-  "version": "0.0.13",
+  "id": "${mod_name}",
+  "version": "${mod_version}",
   "name": "SibEnergyCraft - Mod API",
   "description": "SibEnergyCraft modification APIs",
   "authors": [
@@ -12,8 +12,8 @@
   "icon": "assets/sib_energy_craft/icon.png",
   "environment": "*",
   "depends": {
-    "fabricloader": ">=0.14.21",
+    "fabricloader": ">=${loader_version}",
     "fabric": "*",
-    "minecraft": "1.20.2"
+    "minecraft": "${minecraft_version}"
   }
 }

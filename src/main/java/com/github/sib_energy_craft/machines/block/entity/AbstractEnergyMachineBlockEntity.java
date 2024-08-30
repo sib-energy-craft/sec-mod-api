@@ -6,7 +6,8 @@ import com.github.sib_energy_craft.energy_api.EnergyOffer;
 import com.github.sib_energy_craft.energy_api.consumer.EnergyConsumer;
 import com.github.sib_energy_craft.energy_api.items.ChargeableItem;
 import com.github.sib_energy_craft.energy_api.tags.CoreTags;
-import com.github.sib_energy_craft.machines.CombinedInventory;
+import com.github.sib_energy_craft.inventory.CombinedInventory;
+import com.github.sib_energy_craft.inventory.SimpleInventoryRecipeInput;
 import com.github.sib_energy_craft.machines.block.AbstractEnergyMachineBlock;
 import com.github.sib_energy_craft.machines.block.entity.property.EnergyMachinePropertyMap;
 import com.github.sib_energy_craft.machines.block.entity.property.EnergyMachineTypedProperties;
@@ -26,7 +27,7 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -85,7 +86,7 @@ public abstract class AbstractEnergyMachineBlockEntity<B extends AbstractEnergyM
         this.block = block;
 
         var typedInventoryMap = new EnumMap<EnergyMachineInventoryType, Inventory>(EnergyMachineInventoryType.class);
-        typedInventoryMap.put(EnergyMachineInventoryType.SOURCE, new SimpleInventory(sourceSlots));
+        typedInventoryMap.put(EnergyMachineInventoryType.SOURCE, new SimpleInventoryRecipeInput(sourceSlots));
         typedInventoryMap.put(EnergyMachineInventoryType.CHARGE, new SimpleInventory(1));
         typedInventoryMap.put(EnergyMachineInventoryType.OUTPUT, new SimpleInventory(outputSlots));
         this.inventory = new CombinedInventory<>(typedInventoryMap);
@@ -113,18 +114,18 @@ public abstract class AbstractEnergyMachineBlockEntity<B extends AbstractEnergyM
     }
 
     @Override
-    public void readNbt(@NotNull NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         var inventoryCompound = nbt.getCompound("Inventory");
-        this.inventory.readNbt(inventoryCompound);
+        this.inventory.readNbt(inventoryCompound, registryLookup);
         this.energyContainer = CleanEnergyContainer.readNbt(nbt);
     }
 
     @Override
-    protected void writeNbt(@NotNull NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         var inventoryCompound = new NbtCompound();
-        this.inventory.writeNbt(inventoryCompound);
+        this.inventory.writeNbt(inventoryCompound, registryLookup);
         nbt.put("Inventory", inventoryCompound);
         this.energyContainer.writeNbt(nbt);
     }
@@ -278,7 +279,7 @@ public abstract class AbstractEnergyMachineBlockEntity<B extends AbstractEnergyM
 
     /**
      * Method called when block of this entity is placed in the world.<br/>
-     * As argument method accept charge of item, that used as basic block entity charge.
+     * As argument method accepts charge of item, that is used as basic block entity charge.
      *
      * @param charge item charge
      */
@@ -654,11 +655,6 @@ public abstract class AbstractEnergyMachineBlockEntity<B extends AbstractEnergyM
             screenHandler.setPropertySyncer(syncer);
         }
         return screenHandler;
-    }
-
-    @Override
-    public void writeScreenOpeningData(@NotNull ServerPlayerEntity player,
-                                       @NotNull PacketByteBuf buf) {
     }
 
     /**
